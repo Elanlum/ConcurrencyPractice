@@ -13,8 +13,6 @@ public class BlockingStack<E> {
   private final Condition notEmpty;
 
   private int count = 0;
-//  private int top = 0;
-//  private int bottom = 0;
 
   public BlockingStack(int size) {
     this(size, false);
@@ -30,8 +28,7 @@ public class BlockingStack<E> {
   /**
    * Removes the object at the top of this stack and returns that object as the value of this
    * function.
-   *
-   * @return E
+   * @return Gives the removed object.
    */
   public E pop() throws InterruptedException {
     lock.lock();
@@ -57,6 +54,7 @@ public class BlockingStack<E> {
 
   /**
    * Pushes an item onto the top of this stack.
+   * @return The item object itself
    */
   public E push(E item) throws InterruptedException {
     lock.lock();
@@ -66,8 +64,8 @@ public class BlockingStack<E> {
       }
       if (data[data.length - 1] == null) {
         for (int i = 0; i < data.length - 1; i++) {
-          E pred = (E) data[i];
-          data[i+1] = pred;
+          E prev = takeAt(i);
+          data[i + 1] = prev;
         }
         return item;
       }
@@ -81,7 +79,7 @@ public class BlockingStack<E> {
 
   /**
    * Looks at the object at the top of this stack without removing it from the stack.
-   * @return
+   * @return The item object itself
    */
   public E peek() {
     lock.lock();
@@ -90,6 +88,11 @@ public class BlockingStack<E> {
     } finally {
       lock.unlock();
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public E takeAt(int index) {
+    return (E) data[index];
   }
 
 }
